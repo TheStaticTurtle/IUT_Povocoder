@@ -36,7 +36,7 @@ public class Povocoder {
 
 			// Simple dilatation
 			double[] outputWav   = vocodeSimple(newPitchWav, 1.0/freqScale);
-			//StdAudio.save(outPutFile+"Simple.wav", outputWav);
+			StdAudio.save(outPutFile+"Simple.wav", outputWav);
 
 			// Simple dilatation with overlaping
 			//outputWav = vocodeSimpleOver(newPitchWav, 1.0/freqScale);
@@ -88,8 +88,8 @@ public class Povocoder {
 		double[] output = new double[iOut+1];
 		System.out.println("input.length: "+input.length);
 		System.out.println("iOut+1: "+ (iOut+1));
-		System.out.println("linput.length / 44100: "+ (input.length / 44100));
-		System.out.println("(iOut+1) / 44100: "+ ((iOut+1) / 44100));
+		System.out.println("input.length / 44100: "+ (input.length / StdAudio.SAMPLE_RATE));
+		System.out.println("(iOut+1) / 44100: "+ ((iOut+1) / StdAudio.SAMPLE_RATE));
 
 		counter=0;
 		iOut = 0;
@@ -101,16 +101,65 @@ public class Povocoder {
 			}
 			counter += scale;
 		}
-
+		System.out.println("");
+		System.out.println("");
+		System.out.println("");
 		return output;
 	}
 
 	public static double[] vocodeSimple(double[] input, double timeScale){
-		double[] output = new double[input.length];
-		for (int i = 0; i < input.length; i++) {
+		double seqDuration = 0.01; //ms
+		int seqSize = (int)(StdAudio.SAMPLE_RATE * seqDuration);
+		int jumpSize = (int)(seqSize * timeScale);
+		double ratio = (double)jumpSize / (double)seqSize;
+
+		System.out.println("ratio: "+ ratio);
+		System.out.println("seqSize len: "+ ((double)seqSize / StdAudio.SAMPLE_RATE ));
+		System.out.println("jumpSize len: "+ ((double)jumpSize / StdAudio.SAMPLE_RATE ));
+
+
+		int length = (int)((seqSize) * (input.length / jumpSize));
 			
+		System.out.println("input.length / 44100: "+ (input.length / StdAudio.SAMPLE_RATE));
+		System.out.println("length / 44100: "+ (length / StdAudio.SAMPLE_RATE));
+		double[] output = new double[length];
+
+		if(ratio > 1) {
+
+			int i2 = 0;
+			for (int i = 0; i < length; i+=seqSize) {
+				
+				for (int j = 0; j < seqSize; j++) {
+					output[i+j] = input[  Math.min(i2+j,input.length-1) ];
+				}
+
+				i2+= jumpSize;
+
+			}
+			return output;
+
+		} else if (ratio < 1) {
+
+			int i2 = 0;
+			for (int i = 0; i < length; i+=seqSize) {
+				
+				for (int j = 0; j < seqSize; j++) {
+					output[i+j] = input[  Math.min(i2+j,input.length-1) ];
+				}
+
+				int left = jumpSize - seqSize;
+
+				for (int j = 0; j < left; j++) {
+					output[i+j+seqSize] = input[  Math.min(i2+j+seqSize,input.length-1) ];
+				}
+
+				i2+= jumpSize;
+
+			}
+			return output;
+		} else {
+			return output;
 		}
-		return output;
 	}
 
 }
