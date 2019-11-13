@@ -60,17 +60,20 @@ public class Povocoder {
 	}
 
 	static double[] resample(double[] input,double freqScale) {
-		double scale = 1;
+		double scale =1;
 		if( freqScale > 1) {
 			scale = (freqScale - 1)/freqScale;
+			scale = 1 - scale;
 		}	
 		if( freqScale < 1) {
 			scale = (freqScale + 1)/freqScale;
-		}	
+			scale = 1 - scale;
+			if(scale < 0) { scale *= -1; }
+		}
 
-		System.out.println(freqScale);
-		System.out.println(scale);
 
+		System.out.println("freqScale: "+freqScale);
+		System.out.println("scale:"+ scale);
 
 		int iOut = 0;
 		double counter = 0;
@@ -83,6 +86,10 @@ public class Povocoder {
 		}
 
 		double[] output = new double[iOut+1];
+		System.out.println("input.length: "+input.length);
+		System.out.println("iOut+1: "+ (iOut+1));
+		System.out.println("linput.length / 44100: "+ (input.length / 44100));
+		System.out.println("(iOut+1) / 44100: "+ ((iOut+1) / 44100));
 
 		counter=0;
 		iOut = 0;
