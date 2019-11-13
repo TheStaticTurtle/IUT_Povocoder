@@ -35,7 +35,7 @@ public class Povocoder {
 			StdAudio.save(outPutFile+"Resampled.wav", newPitchWav);
 
 			// Simple dilatation
-			//double[] outputWav   = vocodeSimple(newPitchWav, 1.0/freqScale);
+			double[] outputWav   = vocodeSimple(newPitchWav, 1.0/freqScale);
 			//StdAudio.save(outPutFile+"Simple.wav", outputWav);
 
 			// Simple dilatation with overlaping
@@ -95,6 +95,14 @@ public class Povocoder {
 			counter += scale;
 		}
 
+		return output;
+	}
+
+	public static double[] vocodeSimple(double[] input, double timeScale){
+		double[] output = new double[input.length];
+		for (int i = 0; i < input.length; i++) {
+			
+		}
 		return output;
 	}
 
