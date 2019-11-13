@@ -68,9 +68,8 @@ public class Povocoder {
 			scale = (freqScale + 1)/freqScale;
 		}	
 
-		System.out.println(freqScale);
-		System.out.println(scale);
-
+		System.out.println("Scale: "+freqScale);
+		System.out.println("Local scale"+ scale);
 
 		int iOut = 0;
 		double counter = 0;
@@ -83,6 +82,8 @@ public class Povocoder {
 		}
 
 		double[] output = new double[iOut+1];
+		System.out.println("Nb sample in: "+input.length);
+		System.out.println("Nb sample out: "+ (iOut+1));
 
 		counter=0;
 		iOut = 0;
