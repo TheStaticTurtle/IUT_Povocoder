@@ -122,7 +122,7 @@ public class Povocoder {
 			
 		System.out.println("input.length / 44100: "+ (input.length / StdAudio.SAMPLE_RATE));
 		System.out.println("length / 44100: "+ (length / StdAudio.SAMPLE_RATE));
-		double[] output = new double[length];
+		double[] output = new double[length]; 
 
 		if(ratio > 1) {
 
