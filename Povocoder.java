@@ -51,7 +51,6 @@ public class Povocoder {
 			// Some echo above all
 			//outputWav = echo(outputWav, 100, 0.7);
 			//StdAudio.save(outPutFile+"SimpleOverCrossEcho.wav", outputWav);
-
 		}
 		catch (Exception e)
 		{
@@ -106,6 +105,36 @@ public class Povocoder {
 		System.out.println("");
 		return output;
 	}
+
+	static double map(double x, double in_min, double in_max, double out_min, double out_max) {
+		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+	}
+
+	public static double[] fadeOut(double[] input, double duration) {
+		int seqSize = Math.min( (int)(StdAudio.SAMPLE_RATE * duration) , input.length);
+		int minI = (input.length - seqSize);
+		int maxI = input.length;
+
+		for (int i = minI ; i< maxI ; i++) {
+			double multiplier = map(i,minI,maxI,1.0,0.0);
+			input[i] = input[i] * multiplier;
+		}
+		return input;
+	}
+
+	public static double[] fadeIn(double[] input, double duration) {
+		int seqSize = Math.min( (int)(StdAudio.SAMPLE_RATE * duration) , input.length);
+		int minI = 0;
+		int maxI = seqSize;
+
+		for (int i = minI ; i< maxI ; i++) {
+			double multiplier = map(i,minI,maxI,0.0,1.0);
+			input[i] = input[i] * multiplier;
+		}
+		return input;
+	}
+
+
 
 	public static double[] vocodeSimple(double[] input, double timeScale){
 		double seqDuration = 0.01; //ms
