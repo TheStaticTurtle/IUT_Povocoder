@@ -58,4 +58,15 @@ public class Povocoder {
 			System.out.println("Error: "+ e.toString());
 		}
 	}
+
+	double[] resample(double[] input,double freqScale) {
+		double scale = 1;
+		if( freqScale > 1) {
+			scale = (freqScale - 1)/freqScale
+		}	
+		if( freqScale < 1) {
+			scale = (freqScale + 1)/freqScale
+		}	
+	}
+
 }
