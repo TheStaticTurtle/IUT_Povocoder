@@ -39,8 +39,8 @@ public class Povocoder {
 			StdAudio.save(outPutFile+"Simple.wav", outputWav);
 
 			// Simple dilatation with overlaping
-			//outputWav = vocodeSimpleOver(newPitchWav, 1.0/freqScale);
-			//StdAudio.save(outPutFile+"SimpleOver.wav", outputWav);
+			outputWav = vocodeSimpleOver(newPitchWav, 1.0/freqScale);
+			StdAudio.save(outPutFile+"SimpleOver.wav", outputWav);
 
 			// Simple dilatation with overlaping and maximum cross correlation search
 			//outputWav = vocodeSimpleOverCross(newPitchWav, 1.0/freqScale);
@@ -110,35 +110,35 @@ public class Povocoder {
 		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 	}
 
-	public static double[] fadeOut(double[] input, double duration) {
-		int seqSize = Math.min( (int)(StdAudio.SAMPLE_RATE * duration) , input.length);
-		int minI = (input.length - seqSize);
-		int maxI = input.length;
+	// public static double[] fadeOut(double[] input, double duration) {
+	// 	int seqSize = Math.min( (int)(StdAudio.SAMPLE_RATE * duration) , input.length);
+	// 	int minI = (input.length - seqSize);
+	// 	int maxI = input.length;
 
-		for (int i = minI ; i< maxI ; i++) {
-			double multiplier = map(i,minI,maxI,1.0,0.0);
-			input[i] = input[i] * multiplier;
-		}
-		return input;
-	}
+	// 	for (int i = minI ; i< maxI ; i++) {
+	// 		double multiplier = map(i,minI,maxI,1.0,0.0);
+	// 		input[i] = input[i] * multiplier;
+	// 	}
+	// 	return input;
+	// }
 
-	public static double[] fadeIn(double[] input, double duration) {
-		int seqSize = Math.min( (int)(StdAudio.SAMPLE_RATE * duration) , input.length);
-		int minI = 0;
-		int maxI = seqSize;
+	// public static double[] fadeIn(double[] input, double duration) {
+	// 	int seqSize = Math.min( (int)(StdAudio.SAMPLE_RATE * duration) , input.length);
+	// 	int minI = 0;
+	// 	int maxI = seqSize;
 
-		for (int i = minI ; i< maxI ; i++) {
-			double multiplier = map(i,minI,maxI,0.0,1.0);
-			input[i] = input[i] * multiplier;
-		}
-		return input;
-	}
+	// 	for (int i = minI ; i< maxI ; i++) {
+	// 		double multiplier = map(i,minI,maxI,0.0,1.0);
+	// 		input[i] = input[i] * multiplier;
+	// 	}
+	// 	return input;
+	// }
 
 
 
 	public static double[] vocodeSimple(double[] input, double timeScale){
-		double seqDuration = 0.01; //ms
-		int seqSize = (int)(StdAudio.SAMPLE_RATE * seqDuration);
+		// double seqDuration = 0.01; //ms
+		int seqSize = SEQUENCE;//(int)(StdAudio.SAMPLE_RATE * seqDuration);
 		int jumpSize = (int)(seqSize * timeScale);
 		double ratio = (double)jumpSize / (double)seqSize;
 
@@ -185,6 +185,77 @@ public class Povocoder {
 				i2+= jumpSize;
 
 			}
+			return output;
+		} else {
+			return output;
+		}
+	}
+
+	static double[] vocodeSimpleOver(double[] input, double timeScale){
+		// double seqDuration = 0.1; //s
+		// double fadeDuration = 0.05; //s
+		int seqSize = SEQUENCE; //(int)(StdAudio.SAMPLE_RATE * seqDuration);
+		int fadeSize = OVERLAP; //(int)(StdAudio.SAMPLE_RATE * fadeDuration);
+
+		int jumpSize = (int)(seqSize * timeScale);
+		double ratio = (double)jumpSize / (double)seqSize;
+
+		System.out.println("ratio: "+ ratio);
+		System.out.println("seqSize len: "+ ((double)seqSize / StdAudio.SAMPLE_RATE ));
+		System.out.println("jumpSize len: "+ ((double)jumpSize / StdAudio.SAMPLE_RATE ));
+
+
+		int length = (int)((seqSize) * (input.length / jumpSize));
+			
+		System.out.println("input.length / 44100: "+ (input.length / StdAudio.SAMPLE_RATE));
+		System.out.println("length / 44100: "+ (length / StdAudio.SAMPLE_RATE));
+		double[] output = new double[length]; 
+
+		if(ratio > 1) {
+
+			int i2 = 0;
+			for (int i = 0; i < length; i+=(seqSize)) {
+
+				double[] arr = new double[seqSize+fadeSize*2];
+				for (int j = 0; j < arr.length; j++) {
+					arr[j] = input[  Math.min(i2+j,input.length-1) ];
+				}
+
+				if(i >= seqSize+fadeSize) {
+					for (int j=0; j <fadeSize; j++) {
+						double mulExisting = map(j,0,fadeSize,1.0,0.5);
+						double mulAdding = map(j,0,fadeSize,0.5,1);
+
+
+						int start = Math.min(i+j-fadeSize*2 ,length-1);
+						// output[start] = 0.5;
+						output[start] = ((output[start+fadeSize] * mulExisting) + (arr[j] * mulAdding)) / 2;
+						// output[start] = (output[start+fadeSize] * mulExisting);
+						// output[start] = (arr[j] * mulAdding);
+						// int s = Math.min(i+j,length-1) - fadeSize /2;
+					}
+					
+					for (int j=fadeSize; j< (arr.length - fadeSize); j++) {
+						int min = Math.min(i+j,length-1);
+						output[min] = arr[j];
+					}
+					
+
+				} else {
+					for (int j=0; j< arr.length; j++) {
+						output[i+j] = arr[j];
+					}
+				}
+				
+
+				i2+= jumpSize;
+
+			}
+			return output;
+
+
+
+		} else if (ratio < 1) {
 			return output;
 		} else {
 			return output;
