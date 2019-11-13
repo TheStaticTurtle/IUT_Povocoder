@@ -62,11 +62,13 @@ public class Povocoder {
 	static double[] resample(double[] input,double freqScale) {
 		double scale = 1;
 		if( freqScale > 1) {
-			scale = (freqScale - 1)/freqScale;
+			scale = freqScale - 1;
 		}	
 		if( freqScale < 1) {
 			scale = (freqScale + 1)/freqScale;
-		}	
+			scale -= 1;
+		}
+
 
 		System.out.println("Scale: "+freqScale);
 		System.out.println("Local scale"+ scale);
