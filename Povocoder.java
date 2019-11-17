@@ -39,8 +39,8 @@ public class Povocoder {
 			StdAudio.save(outPutFile+"Simple.wav", outputWav);
 
 			// Simple dilatation with overlaping
-			outputWav = vocodeSimpleOver(newPitchWav, 1.0/freqScale);
-			StdAudio.save(outPutFile+"SimpleOver.wav", outputWav);
+			//outputWav = vocodeSimpleOver(newPitchWav, 1.0/freqScale);
+			//StdAudio.save(outPutFile+"SimpleOver.wav", outputWav);
 
 			// Simple dilatation with overlaping and maximum cross correlation search
 			//outputWav = vocodeSimpleOverCross(newPitchWav, 1.0/freqScale);
@@ -49,8 +49,8 @@ public class Povocoder {
 			//joue(outputWav);
 
 			// Some echo above all
-			//outputWav = echo(outputWav, 100, 0.7);
-			//StdAudio.save(outPutFile+"SimpleOverCrossEcho.wav", outputWav);
+			double[] outputWav = echo(outputWav, 1000, 0.7);
+			StdAudio.save(outPutFile+"SimpleOverCrossEcho.wav", outputWav);
 		}
 		catch (Exception e)
 		{
@@ -260,6 +260,27 @@ public class Povocoder {
 		} else {
 			return output;
 		}
+	}
+
+	static double[] echo(double[] input, double delayMS, double attn) {
+		if(attn <= 0) { return input; }
+		int padding = StdAudio.SAMPLE_RATE * (int)delayMS / 1000;
+		int outputLenght = input.length + padding;
+
+		double[] output = new double[outputLenght];
+		System.out.println("Echo output len: "+ outputLenght);
+
+		//Peut pas faire output = input car sa copie aussi la taille
+		for (int i=0;i<input.length; i++) {
+			output[i] = input[i];
+		}
+
+		for (int i=0; i< input.length; i++ ) {
+			int o = i+padding; //Math.min(i+padding , output.length-1);
+			output[o] = (output[o] + input[i] * attn) / 2;
+		}
+
+		return output;
 	}
 
 }
