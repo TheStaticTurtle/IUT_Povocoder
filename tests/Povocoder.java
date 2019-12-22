@@ -198,12 +198,14 @@ public class Povocoder {
 		if(timeScale > 1) {
 			int i2 = 0;
 			double[] fade = new double[fadeSize];
-			for (int i = 0; i < length; i += seqSize) { //Pour chaque séquence du fichier
+			for (int i = 0; i < length; i += seqSize - fadeSize) { //Pour chaque séquence du fichier
+				if(i + seqSize - fadeSize > length)
+					break;
 
 				// -------------------------------Fade In------------------------------
 				double[] fade2 = new double[fadeSize];
 				for (int j = 0; j < fade2.length; j++) { //On rempli le tableau des valeurs a fade
-					fade2[j] = input[i2 + j];
+					fade2[j] = input[Math.min(i2 + j, input.length-1)];
 				}
 				fade2 = fadeIn(fade2); //On applique l'effet
 
@@ -219,14 +221,14 @@ public class Povocoder {
 
 
 				// -------------------------------Milieu------------------------------
-				for (int j = fadeSize; j < seqSize; j++) { //Pour chaque valeur dans la séquence
+				for (int j = fadeSize; j < seqSize - fadeSize; j++) { //Pour chaque valeur dans la séquence
 					output[i+j] = input[Math.min(i2 + j + fadeSize, input.length-1)]; //Min dans le cas ou on dépasse la fin du tableau
 				}
 
 
 				// -------------------------------Fade Out------------------------------
 				for (int j = 0; j < fadeSize; j++) { //On rempli le tableau des valeurs a fade
-					fade[j] = input[i2 + seqSize - fadeSize + j];
+					fade[j] = input[Math.min(i2 + j + seqSize - fadeSize, input.length-1)];
 				}
 				fade = fadeOut(fade); //On applique l'effet
 
