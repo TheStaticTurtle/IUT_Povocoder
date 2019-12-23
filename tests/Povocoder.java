@@ -205,14 +205,14 @@ public class Povocoder {
 				for (int j = 0; j < fade2.length; j++) { //On rempli le tableau des valeurs a fade
 					fade2[j] = input[Math.min(i2 + j, input.length-1)];
 				}
-				//fade2 = fadeIn(fade2); //On applique l'effet
+				fade2 = fadeIn(fade2); //On applique l'effet
 
 				double[] newFade = new double[fadeSize];
 				for (int j = 0; j < fadeSize; j++) { // On mixe les deux valeurs
 					double balance = map(j, 0, fadeSize, 0., 1.);
-					//newFade[j] = (fade[j] * (1-balance) + fade2[j] * balance);
+					newFade[j] = (fade[j] * (1-balance) + fade2[j] * balance) / 2;
 					//System.out.println(Double.toString(fade[j]) + " -- " + Double.toString(fade2[j]) + " -- " + Double.toString((fade[j] + fade2[j]) / 2));
-					newFade[j] = (fade[j] + fade2[j]) / 2;
+					//newFade[j] = (fade[j] + fade2[j]) / 2;
 				}
 
 				for (int j = 0; j < fadeSize; j++) { //On remplace les valeurs dans le son final
@@ -230,7 +230,7 @@ public class Povocoder {
 				for (int j = 0; j < fadeSize; j++) { //On rempli le tableau des valeurs a fade
 					fade[j] = input[Math.min(i2 + j + seqSize - fadeSize, input.length-1)];
 				}
-				//fade = fadeOut(fade); //On applique l'effet
+				fade = fadeOut(fade); //On applique l'effet
 
 				i2 += jumpSize; //On jump
 			}
