@@ -1,2 +1,3 @@
 # IUT_ProjFinDeS1
-## Pas toucher au main
+
+Assignment for the semester 1 at the IUT of Belfort Monbeliard. Basicaly a **non** working vocoder
